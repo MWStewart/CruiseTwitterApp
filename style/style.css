@@ -1,0 +1,209 @@
+/*
+		File		:	style.css		
+		Programmer	: 	Mikey Stewart
+		Date		: 	11/06/2014
+		
+		Desc		:	css file.  controls how index.php looks
+*/
+
+body
+{
+	font-family:Arial;
+}
+
+#main
+{
+	width: 1024px;
+	margin-left: auto;
+	margin-right: auto;
+	position:relative;
+	border-style:solid;
+	border-width:1px;/**/
+}
+
+#header
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	width:100%;
+	height: 200px;
+	background-color:black;	
+	position: relative;
+}
+
+#headerTitle
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	background-color:black;		
+	width: 25%;
+	position:relative;
+	color:white;
+	float:left;
+	font-weight:bold;
+	font-size: 50px;
+	
+}
+
+#headerTitleText
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	background-color:black;	
+	color: white;		
+	width:auto;
+	position:relative;
+	float:left;
+	/*height:60px;*/ 
+	width:74%;
+}
+
+#input
+{
+	position:relative;
+	width:100%;
+	/*border-style:solid;
+	border-width:1px;*/
+	height: 150px;
+	margin-bottom:10px;
+	
+}
+
+#inputTitle
+{
+	position:absolute;
+	/*border-style:solid;
+	border-width:1px;*/
+	top: 5px;
+	left: 5px;
+	font-weight:bold;
+	font-size: 24px;
+	color: rgb(90, 189, 221);	
+}
+
+#inputImgHolder
+{
+	position:absolute;
+	/*border-style:solid;
+	border-width:1px;*/	
+	width: 85px;
+	height: 85px;
+	bottom:15px;
+	left:5px;
+	background-image: url('../images/twitter-logo.jpg');
+	/*background-image: url('http://pbs.twimg.com/profile_images/792221815/Angry_batman_normal.JPG');*/
+	background-size:contain;
+}
+
+#inputTextBox 
+{
+	position:absolute;
+	/*border-style:solid;
+	border-width:1px;	*/
+	width: 910px;
+	height: 30px;
+	bottom:15px;
+	left:100px;	
+}
+
+.c_inputTextBox
+{	
+	width: 910px;
+	height: 30px;
+	bottom:15px;
+	left:100px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	/*border-style:solid;
+	border-width:1px;*/
+	border-color:#CCCCCC;
+	color:#A3A3A3;
+}
+
+#buttons
+{
+	padding-left:auto;
+	padding-right:auto;
+	margin:auto;
+	width:750px;
+	position:relative;
+	/*border-style:solid;
+	border-width:1px;*/	
+	margin-top:10px;
+	margin-bottom:10px;
+	
+}
+
+.btnType1
+{
+	color: white;
+	background-color: rgb(90, 189, 221);	
+    border-radius: 10px;	
+	font-weight:bold;
+	font-size:14px;
+	width:100%;	
+}
+
+#results
+{
+	/*border-style:solid;
+	border-width:1px;*/
+}
+
+#resultsTitle
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	font-weight:bold;
+	font-size: 18px;
+	background-color:#DDDDDD;
+	color: rgb(90, 189, 221);	
+}
+
+#resultsPanel
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	width: 100%;
+	height:600px;
+	position:relative;
+	overflow:scroll; /*this will set up a scrollbar if the tweets are bigger than the container div*/
+}
+
+#hashtags
+{
+	/*border-style:solid;
+	border-width:1px;*/
+}
+
+#hashtagsTitle
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	font-weight:bold;
+	font-size: 18px;
+	background-color:#DDDDDD;
+	color: rgb(90, 189, 221);
+}
+
+#hashtagsPanel
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	width: 100%;
+	height:150px;
+	position:relative;
+	overflow:scroll;
+}
+
+#footer
+{
+	/*border-style:solid;
+	border-width:1px;*/
+	background-color:black;
+	color:white;
+	text-align:center;
+	padding-top: 10px;
+	padding-bottom:10px;
+}
