@@ -73,9 +73,16 @@ class c_TwitterApp
 		//spit out the results 
 		$rowColour;
 		$rowIndex = 0;
-		//echo var_dump($result); use this grab the raw data 
+		//echo var_dump($result); //use this grab the raw data 
+		//return;		
 		
-		if(count($result) == 0)  //check that there ARE results to display
+		if (array_key_exists("error", $result) == true) //check if the twitter name is valid
+		{
+			echo "No records found";
+			return;
+		}
+		
+		if((count($result) == 0))  //check that there ARE results to display
 			echo"No results found";
 		else
 		{		
@@ -107,8 +114,8 @@ class c_TwitterApp
 				
 				++$rowIndex;				
 			}
-			echo"</table>";	
-		}
+			echo"</table>";			
+		}		
 	}
 	
 	/*this method uses the twitter api to grab the last 20 tweets from the submitted twitter account, sorted by tweet length*/
@@ -118,26 +125,33 @@ class c_TwitterApp
 		$asc = $sortOrder; 
 		
 		//run the query 		
-		$result = $this->m_runTwitterQuery("20", "false", "true", "true");				
+		$result = $this->m_runTwitterQuery("20", "false", "true", "true");		
 		
-		//build a temp array using the date and text (look at array_push)
-		$tempResults = $result;
+		if (array_key_exists("error", $result) == true) //check if the twitter name is valid
+		{
+			echo "No records found";
+			return;
+		}	
 		
-		//sort the array
-		//usort($tempResults,'m_lensort2'); 
-		usort($tempResults, array($this, 'm_lensort2'));  //this is how to use usort with a class method
-		
-		if($asc == "false")
-			$tempResults = array_reverse($tempResults);
-		
-		
-		//spit out the results		
-		$rowColour;
-		$rowIndex = 0;
 		if(count($result) == 0)  //check that there ARE results to display
 			echo"No results found";
 		else
 		{
+			//build a temp array using the date and text (look at array_push)
+			$tempResults = $result;
+		
+			//sort the array
+			//usort($tempResults,'m_lensort2'); 
+			usort($tempResults, array($this, 'm_lensort2'));  //this is how to use usort with a class method
+		
+			if($asc == "false")
+				$tempResults = array_reverse($tempResults);
+		
+		
+			//spit out the results		
+			$rowColour;
+			$rowIndex = 0;
+			
 			echo"<table style='border-collapse:collapse' border=0>"; //make this table a css style?
 			foreach($tempResults as $tweet)	
 			{		
@@ -166,7 +180,7 @@ class c_TwitterApp
 				++$rowIndex;			
 			}
 			echo"</table>";	
-		}
+		}		
 	}
 	
 	/*this method uses the twitter api to grab those tweets that have links*/
@@ -179,7 +193,13 @@ class c_TwitterApp
 		
 		//spit out the results		
 		//go through the results array, check the entities element for a url object.
-		//if there is one, display the tweet. 	
+		//if there is one, display the tweet. 
+		
+		if (array_key_exists("error", $result) == true) //if there are no results (dodgy twitter name, for example) quit out
+		{
+			echo "No records found";
+			return;
+		}
 		
 		$rowColour;
 		$rowIndex = 0;	
@@ -270,6 +290,13 @@ class c_TwitterApp
 		
 		$rowColour;
 		$rowIndex = 0;	
+		
+		if (array_key_exists("error", $result) == true)
+		{
+			echo "No records found";
+			return;
+		}
+		
 		if(count($result) == 0)  //check that there ARE results to display
 			echo"No results found";
 		else
@@ -330,6 +357,12 @@ class c_TwitterApp
 		//run the query 				
 		$result = $this->m_runTwitterQuery("20", "true", "true", "true");		
 		
+		if (array_key_exists("error", $result) == true) //check if the twitter name is valid
+		{
+			echo "No records found";
+			return;
+		}
+				
 		//sort the results
 		if($asc == false)
 			$result = array_reverse($result);//reverse the array
@@ -368,7 +401,7 @@ class c_TwitterApp
 				++$rowIndex;			
 			}
 			echo"</table>";	
-		}	
+		}		
 	}
 	
 	//this method gets all the hashtags included in the 20 tweets and displays them in the div specified by the corresponding 
@@ -383,6 +416,13 @@ class c_TwitterApp
 		$noHashtagsFound = true;
 		$tweetIndex=0;
 		$hashtagIndex=0;
+		
+		if(array_key_exists("error", $result))
+		{
+			echo "No hashtags found";
+			return;
+		}
+		
 		foreach($result as $tweet)	
 		{		
 			//grab the entities object
