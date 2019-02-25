@@ -1,10 +1,10 @@
 <?php
 /*
-	class c_TwitterApp.  The code creates an object of this class.  This is the class that handles off the work
+	class c_TwitterApp.  The code creates an object of this class.  This is the class that handles the work
 */
-
-
-include "twitteroauth/twitteroauth/twitteroauth.php";  //this is an external library used to set up the twitter authorisation
+ 
+require "twitteroauth/autoload.php"; //this is an external library used to set up the twitter authorisation
+use Abraham\TwitterOAuth\TwitterOAuth;
 
 class c_TwitterApp
 {
@@ -36,29 +36,12 @@ class c_TwitterApp
 	//this sets up the twitter api query
 	public function m_runTwitterQuery($count, $includeEntities, $excludeReplies, $trimUser)//in time, add the api url command as a param ("user_timerline.json")
 	{	
-		//run the query 		
-		$queryArray = array("screen_name" 	=>"".$this->str_accName."", 
-						"count"	=>"".$count."", //these two fields are all we need
-						"include_entities" => "".$includeEntities."", //the rest is to make the response string as short as possible (easier parsing) (was false)
-						"exclude_replies" => "".$excludeReplies."",
-						"trim_user" => "".$trimUser.""); //was true
-						
-		//url encode the array (values) before submitting the query
-		$queryString = "";
-		$index = 0;
-		foreach($queryArray as $key => $value)	
-		{
-			//append key=(encoded)value to query string
-			$queryString .= $key."=".rawurlencode($value);	
-			if($index != count($queryArray)-1)
-				$queryString.="&";
-				
-			++$index;
-		}
-	
-		//return the results (array of tweets)
-		$queryResult = (array)$this->twitterOauth->get("https://api.twitter.com/1.1/statuses/user_timeline.json?".$queryString); //this url changes depending on what you what the search to return
+		//https://developer.twitter.com/en/docs/tweets/timelines/api-reference/get-statuses-user_timeline.html
 		
+		//run the query and return the results (array of tweets)
+		//$queryResult = (array)$this->twitterOauth->get("statuses/user_timeline", ["screen_name" => 'michaelpachter', "count" => 20, "include_entities" => true, "exclude_replies" => true, "trim_user" => false]); //this is the format to use (@ can be eityher used or left out.  dones't matter)
+		$queryResult = (array)$this->twitterOauth->get("statuses/user_timeline", ["screen_name" => $this->str_accName, "count" => $count, "include_entities" => $includeEntities, "exclude_replies" => $excludeReplies, "trim_user" => $trimUser]); //this is the format to use (@ can be eityher used or left out.  dones't matter)
+			
 		return $queryResult;
 	}
 	
@@ -68,15 +51,19 @@ class c_TwitterApp
 		$this->str_accName = $_GET["accName"]; //grab the user input	
 				
 		//run the query 		
-		$result = $this->m_runTwitterQuery("20", "true", "true", "false");		
+		$result = $this->m_runTwitterQuery(20, true, true, false);
 		
 		//spit out the results 
 		$rowColour;
 		$rowIndex = 0;
-		//echo var_dump($result); //use this grab the raw data 
-		//return;		
-		
+			
 		if (array_key_exists("error", $result) == true) //check if the twitter name is valid
+		{
+			echo "No records found";
+			return;
+		}
+		
+		if (empty($result) == true) 
 		{
 			echo "No records found";
 			return;
@@ -88,7 +75,7 @@ class c_TwitterApp
 		{		
 			echo"<table style='border-collapse:collapse' border=0>";	
 			foreach($result as $tweet)	
-			{
+			{			
 				$date = substr($tweet->created_at, 3, 16); //grab the date by getting the substring from the 'created_at' field
 				$year = substr($tweet->created_at, 26, 4); //ditto for the year
 				($rowIndex%2)?$rowColour='#FFFFFF':$rowColour='#CCCCCC';
@@ -97,8 +84,11 @@ class c_TwitterApp
 						<td width=130px;>".$date." ".$year."</td>";
 						
 						$tempText = $tweet->text;
-						$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co), and rewrite the tweet text accordingly
-						if($start == FALSE)
+						$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co or https://t.co), and rewrite the tweet text accordingly
+						if ($start == FALSE)
+							$start = strpos($tempText, "https://t.co");
+						
+						if($start == FALSE)						
 							echo"<td>".$tempText."</td>";
 						else
 						{						
@@ -131,17 +121,28 @@ class c_TwitterApp
 		{
 			echo "No records found";
 			return;
-		}	
+		}
+		
+		if (empty($result) == true) 
+		{
+			echo "No records found";
+			return;
+		}
+
+		if (empty($result) == true) 
+		{
+			echo "No records found";
+			return;
+		}		
 		
 		if(count($result) == 0)  //check that there ARE results to display
-			echo"No results found";
+			echo"No results found!";
 		else
 		{
 			//build a temp array using the date and text (look at array_push)
 			$tempResults = $result;
 		
 			//sort the array
-			//usort($tempResults,'m_lensort2'); 
 			usort($tempResults, array($this, 'm_lensort2'));  //this is how to use usort with a class method
 		
 			if($asc == "false")
@@ -162,7 +163,10 @@ class c_TwitterApp
 					<tr style='background-color:".$rowColour."'>
 						<td width=130px;>".$date." ".$year."</td>";
 							$tempText = $tweet->text;
-							$start = strpos($tempText, "http://t.co");
+							$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co or https://t.co), and rewrite the tweet text accordingly
+							if ($start == FALSE)
+								$start = strpos($tempText, "https://t.co");
+						
 							if($start == FALSE)
 								echo"<td>".$tempText."</td>";
 							else
@@ -201,6 +205,12 @@ class c_TwitterApp
 			return;
 		}
 		
+		if (empty($result) == true) 
+		{
+			echo "No records found";
+			return;
+		}
+		
 		$rowColour;
 		$rowIndex = 0;	
 		if(count($result) == 0)  //check that there ARE results to display
@@ -222,7 +232,11 @@ class c_TwitterApp
 						<tr style='background-color:".$rowColour."'>
 							<td width=130px;>".$date." ".$year."</td>";
 							$tempText = $tweet->text;
-							$start = strpos($tempText, "http://t.co");
+							
+							$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co or https://t.co), and rewrite the tweet text accordingly
+							if ($start == FALSE)
+								$start = strpos($tempText, "https://t.co");
+							
 							if($start == FALSE)
 								echo"<td>".$tempText."</td>";
 							else
@@ -250,7 +264,11 @@ class c_TwitterApp
 						<tr style='background-color:".$rowColour."'>
 							<td width=130px;>".$date." ".$year."</td>";
 							$tempText = $tweet->text;
-							$start = strpos($tempText, "http://t.co");
+							
+							$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co or https://t.co), and rewrite the tweet text accordingly
+							if ($start == FALSE)
+								$start = strpos($tempText, "https://t.co");
+							
 							if($start == FALSE)
 								echo"<td>".$tempText."</td>";
 							else
@@ -297,6 +315,12 @@ class c_TwitterApp
 			return;
 		}
 		
+		if (empty($result) == true) 
+		{
+			echo "No records found";
+			return;
+		}
+		
 		if(count($result) == 0)  //check that there ARE results to display
 			echo"No results found";
 		else
@@ -317,7 +341,11 @@ class c_TwitterApp
 						<tr style='background-color:".$rowColour."'>
 							<td width=130px;>".$date." ".$year."</td>";
 							$tempText = $tweet->text;
-							$start = strpos($tempText, "http://t.co");
+							
+							$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co or https://t.co), and rewrite the tweet text accordingly
+							if ($start == FALSE)
+								$start = strpos($tempText, "https://t.co");
+							
 							if($start == FALSE)
 								echo"<td>".$tempText."</td>";
 							else
@@ -362,6 +390,12 @@ class c_TwitterApp
 			echo "No records found";
 			return;
 		}
+		
+		if (empty($result) == true) 
+		{
+			echo "No records found";
+			return;
+		}
 				
 		//sort the results
 		if($asc == false)
@@ -384,7 +418,11 @@ class c_TwitterApp
 					<tr style='background-color:".$rowColour."'>
 						<td width=130px;>".$date." ".$year."</td>";
 						$tempText = $tweet->text;
-						$start = strpos($tempText, "http://t.co");
+						
+						$start = strpos($tempText, "http://t.co"); //check for a hyperlink (http://t.co or https://t.co), and rewrite the tweet text accordingly
+						if ($start == FALSE)
+							$start = strpos($tempText, "https://t.co");
+						
 						if($start == FALSE)
 							echo"<td>".$tempText."</td>";
 						else
@@ -420,6 +458,12 @@ class c_TwitterApp
 		if(array_key_exists("error", $result))
 		{
 			echo "No hashtags found";
+			return;
+		}
+		
+		if (empty($result) == true) 
+		{
+			echo "No records found";
 			return;
 		}
 		

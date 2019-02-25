@@ -6,7 +6,7 @@
 		
 		Desc		:	Simple app to grab, sort and filter the last 20 tweets on a given twitter account.  
 						
-						sample twitter account used for testing:  @thebatman
+						sample twitter account used for testing:  @thebatman / @michaelpachter
 						
 						this page is the html entry point.  it's just a form.
 		
